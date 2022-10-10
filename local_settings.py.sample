@@ -1,0 +1,7 @@
+db_settings = {
+    'name': 'result.db'
+}
+
+url = 'https://sobaka[.]babaka[.]xyz'
+id = 100
+
