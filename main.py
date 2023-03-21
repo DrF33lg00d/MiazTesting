@@ -11,8 +11,6 @@ POSITION_FORMAT: str = '{posid}-{catid} | {pos} | {cat}'
 
 
 if '__main__' == __name__:
-    init_tables()
-
     raw_response: str = (
         requests.post(settings.url, {'cat_id': settings.id})
         .text
