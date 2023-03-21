@@ -1,33 +1,51 @@
+import json
+
 import requests
 
-from db import db
+from db import PosCat, Question, Answer, init_tables
 import settings
 
 
-count = 0
+count: int = 0
+POSITION_FORMAT: str = '{posid}-{catid} | {pos} | {cat}'
 
 
 if '__main__' == __name__:
-    data = requests.post(settings.url, {'cat_id': settings.id})
-    for que in data.json()['data']['questions']:
-        que_db = db.get_question_id(que['id'])
-        if que_db:
+    init_tables()
+
+    raw_response: str = (
+        requests.post(settings.url, {'cat_id': settings.id})
+        .text
+        .encode('cp1251')
+        .decode('utf-8')
+        )
+    data: dict = json.loads(raw_response)['data']
+    description_pos = POSITION_FORMAT.format(
+        posid=data['pos']['id'],
+        catid=data['cat']['id'],
+        pos=data['pos']['title'],
+        cat=data['cat']['title'],
+    )
+    pos_cat: tuple[PosCat, bool] = PosCat.get_or_create(
+        id=data['cat']['id'],
+        description=description_pos,
+        )
+
+    for q in data['questions']:
+        question: tuple[Question, bool] = Question.get_or_create(
+            id=q['id'],
+            description=q['description'],
+            poscat=pos_cat[0],
+        )
+        if not question[1]:
             count += 1
             continue
-        db.add_question(
-            que['title'],
-            que['id'],
-            que['description']
-        )
-        que_db = db.get_question_id(que['id'])
-        for ans in que['answers']:
-            ans_id = db.get_answer_id(ans['id'])
-            if ans_id:
-                continue
-            db.add_answer(
-                ans['id'],
-                que_db,
-                ans['description'],
-                float(ans['fraction']) > 0.0
+
+        for ans in q['answers']:
+            answer: tuple[Answer, bool] = Answer.get_or_create(
+                id=ans['id'],
+                description=ans['description'],
+                is_correct=float(ans['fraction'])>0.0,
+                question=question[0],
             )
     print(f'{count} questions were skipped')

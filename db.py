@@ -28,6 +28,7 @@ class Answer(DefaultModel):
     id = PrimaryKeyField()
     description = CharField()
     is_correct = BooleanField(default=False)
+    question = ForeignKeyField(Question, backref='question')
 
 
 def init_tables(db: Database = db) -> None:
