@@ -3,21 +3,24 @@ import json
 import requests
 
 from db import PosCat, Question, Answer, init_tables
-import settings
-
-
-count: int = 0
-POSITION_FORMAT: str = '{posid}-{catid} | {pos} | {cat}'
+from settings import URL, POSCAT_ID, POSITION_FORMAT, logger
 
 
 if '__main__' == __name__:
-    raw_response: str = (
-        requests.post(settings.url, {'cat_id': settings.id})
-        .text
+    new_question_count: int = 0
+
+    response: requests.Response = requests.post(URL, {'cat_id': POSCAT_ID})
+    logger.debug(f'Reponse result: {response.status_code}')
+    if response.status_code != 200:
+        logger.warning('Bad response status code, closing...')
+        exit()
+
+    raw_text: str = (
+        response.text
         .encode('cp1251')
         .decode('utf-8')
         )
-    data: dict = json.loads(raw_response)['data']
+    data: dict = json.loads(raw_text)['data']
     description_pos = POSITION_FORMAT.format(
         posid=data['pos']['id'],
         catid=data['cat']['id'],
@@ -28,6 +31,10 @@ if '__main__' == __name__:
         id=data['cat']['id'],
         description=description_pos,
         )
+    if pos_cat[1]:
+        logger.info(f'Add new PosCat, id={pos_cat[0].id}')
+    else:
+        logger.debug(f'PosCat already exists, id={pos_cat[0].id}')
 
     for q in data['questions']:
         question: tuple[Question, bool] = Question.get_or_create(
@@ -35,9 +42,11 @@ if '__main__' == __name__:
             description=q['description'],
             poscat=pos_cat[0],
         )
+
         if not question[1]:
-            count += 1
+            new_question_count += 1
             continue
+        logger.info(f'Add new question, id={question[0].id}')
 
         for ans in q['answers']:
             answer: tuple[Answer, bool] = Answer.get_or_create(
@@ -46,4 +55,7 @@ if '__main__' == __name__:
                 is_correct=float(ans['fraction'])>0.0,
                 question=question[0],
             )
-    print(f'{count} questions were skipped')
+            if answer[1]:
+                logger.info(f'Add new answer, id={answer[0].id}')
+    if new_question_count:
+        logger.info(f'{new_question_count} questions already exists')
