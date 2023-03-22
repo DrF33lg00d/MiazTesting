@@ -1,8 +1,8 @@
-from db import PosCat, Question, Answer, init_tables
+from src.db import PosCat, Question, Answer, init_tables
 from utils.settings import logger, POSCAT_ID
 
 
-if '__main__' == __name__:
+def main():
     init_tables()
     print('Create file')
 
@@ -43,3 +43,7 @@ if '__main__' == __name__:
         f.write('</body>')
         f.write('</html>')
     logger.info('File answers.html created')
+
+
+if '__main__' == __name__:
+    main()
