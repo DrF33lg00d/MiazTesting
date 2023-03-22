@@ -44,8 +44,8 @@ if '__main__' == __name__:
         )
 
         if not question[1]:
-            new_question_count += 1
             continue
+        new_question_count += 1
         logger.info(f'Add new question, id={question[0].id}')
 
         for ans in q['answers']:
@@ -58,4 +58,4 @@ if '__main__' == __name__:
             if answer[1]:
                 logger.info(f'Add new answer, id={answer[0].id}')
     if new_question_count:
-        logger.info(f'{new_question_count} questions already exists')
+        logger.info(f'{new_question_count} questions were added')
