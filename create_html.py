@@ -32,8 +32,10 @@ if '__main__' == __name__:
                 f.write(f'<em>{question.description}</em><br>')
                 f.write('<ul>')
                 for answer in answers:
-                    text = f'<b>{answer.description}</b>' if answer.is_correct else answer.description
-                    f.write(f'<li>{text}</li>')
+                    if answer.is_correct:
+                        f.write(f'<li><b>{answer.description}</b></li>')
+                    else:
+                        f.write(f'<li>{answer.description}</li>')
                 f.write('</ul>')
                 f.write('<br>')
         f.write('</body>')
