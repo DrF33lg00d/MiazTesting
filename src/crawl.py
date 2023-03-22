@@ -1,6 +1,7 @@
 import json
 
 import requests
+from tqdm import tqdm
 
 from src.db import PosCat, Question, Answer, init_tables
 from utils.settings import URL, POSCAT_ID, POSITION_FORMAT, logger
@@ -36,7 +37,7 @@ def main():
     else:
         logger.debug(f'PosCat already exists, id={pos_cat[0].id}')
 
-    for q in data['questions']:
+    for q in tqdm(data['questions'], desc='Questions'):
         question: tuple[Question, bool] = Question.get_or_create(
             id=q['id'],
             description=q['description'],
@@ -59,6 +60,7 @@ def main():
                 logger.info(f'Add new answer, id={answer[0].id}')
     if new_question_count:
         logger.info(f'{new_question_count} questions were added')
+    print('Complete')
 
 
 if '__main__' == __name__:

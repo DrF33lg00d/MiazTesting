@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from src.db import PosCat, Question, Answer, init_tables
 from utils.settings import logger, POSCAT_ID
 
@@ -21,9 +23,8 @@ def main():
     logger.debug(f'Count of questions in db: {len(questions)}')
     with open('answers.html', 'w', encoding='utf-8') as f:
         f.write('<html><head><title>Answers</title></head>')
-
         f.write('<body>')
-        for question in questions:
+        for question in tqdm(questions, desc='Questions'):
             answers: list[Answer] = [answer for answer in (Answer
                 .select(Answer, Question)
                 .join(Question)
