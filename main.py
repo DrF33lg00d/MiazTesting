@@ -3,10 +3,11 @@ import json
 import requests
 
 from db import PosCat, Question, Answer, init_tables
-from settings import URL, POSCAT_ID, POSITION_FORMAT, logger
+from utils.settings import URL, POSCAT_ID, POSITION_FORMAT, logger
 
 
 if '__main__' == __name__:
+    init_tables()
     new_question_count: int = 0
 
     response: requests.Response = requests.post(URL, {'cat_id': POSCAT_ID})

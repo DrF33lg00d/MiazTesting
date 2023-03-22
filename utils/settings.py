@@ -3,8 +3,6 @@ import os
 
 from peewee import SqliteDatabase
 
-from contextlib import suppress
-
 
 FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
 logging.basicConfig(format=FORMAT, filename='log.log')
@@ -21,7 +19,7 @@ POSCAT_ID = 100
 POSITION_FORMAT: str = '{posid}-{catid} | {pos} | {cat}'
 
 try:
-    from local_settings import *
+    from utils.local_settings import *
     logger.info('Local settings imported')
 except ImportError:
     logger.warning('Local settings did not import')

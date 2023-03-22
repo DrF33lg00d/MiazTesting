@@ -1,11 +1,9 @@
-import sqlite3
-
 from peewee import (
     Model, PrimaryKeyField, CharField, ForeignKeyField, BooleanField,
     Database,
     )
 
-from settings import db, db_settings
+from utils.settings import db
 
 
 class DefaultModel(Model):
@@ -34,6 +32,3 @@ class Answer(DefaultModel):
 def init_tables(db: Database = db) -> None:
     db.create_tables([PosCat, Question, Answer])  # type: ignore
     return None
-
-
-init_tables()
