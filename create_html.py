@@ -10,6 +10,7 @@ if '__main__' == __name__:
     poscat: PosCat = PosCat.get(id=POSCAT_ID)
     if not poscat:
         logger.critical(f'Cat_id {POSCAT_ID} not found!')
+        exit()
 
     questions: list[Question] = [que for que in (Question
          .select(Question, PosCat)
@@ -17,6 +18,7 @@ if '__main__' == __name__:
          .where(Question.poscat == poscat)
          .order_by(Question.description.asc())
          )]
+    logger.debug(f'Count of questions in db: {len(questions)}')
     with open('answers.html', 'w', encoding='utf-8') as f:
         f.write('<html><head><title>Answers</title></head>')
 
@@ -40,3 +42,4 @@ if '__main__' == __name__:
                 f.write('<br>')
         f.write('</body>')
         f.write('</html>')
+    logger.info('File answers.html created')
