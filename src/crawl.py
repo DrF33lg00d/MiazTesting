@@ -32,7 +32,7 @@ def main(poscat_id: int):
     )
     pos_cat: tuple[PosCat, bool] = PosCat.get_or_create(
         id=data['cat']['id'],
-        description=description_pos,
+        description=description_pos.strip(),
         )
     if pos_cat[1]:
         logger.info(f'Add new PosCat, id={pos_cat[0].id}')
@@ -42,7 +42,7 @@ def main(poscat_id: int):
     for q in tqdm(data['questions'], desc='Questions'):
         question: tuple[Question, bool] = Question.get_or_create(
             id=q['id'],
-            description=q['description'],
+            description=q['description'].strip(),
             poscat=pos_cat[0],
         )
 
@@ -54,7 +54,7 @@ def main(poscat_id: int):
         for ans in q['answers']:
             answer: tuple[Answer, bool] = Answer.get_or_create(
                 id=ans['id'],
-                description=ans['description'],
+                description=ans['description'].strip(),
                 is_correct=float(ans['fraction'])>0.0,
                 question=question[0],
             )
