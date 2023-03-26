@@ -1,6 +1,6 @@
 import json
 
-import click
+import peewee
 import requests
 from tqdm import tqdm
 
@@ -40,23 +40,27 @@ def main(poscat_id: int):
         logger.debug(f'PosCat already exists, id={pos_cat[0].id}')
 
     for q in tqdm(data['questions'], desc='Questions'):
-        question: tuple[Question, bool] = Question.get_or_create(
-            id=q['id'],
-            description=q['description'].strip(),
-            poscat=pos_cat[0],
-        )
+        try:
+            question: tuple[Question, bool] = Question.get_or_create(
+                id=q['id'],
+                description=q['description'].strip(),
+                poscat=pos_cat[0],
+            )
+            if not question[1]:
+                continue
+            question: Question = question[0]
+        except peewee.IntegrityError:
+            question: Question = Question.get_by_id(q['id'])
 
-        if not question[1]:
-            continue
         new_question_count += 1
-        logger.info(f'Add new question, id={question[0].id}')
+        logger.info(f'Add new question, id={question.id}')
 
         for ans in q['answers']:
             answer: tuple[Answer, bool] = Answer.get_or_create(
                 id=ans['id'],
                 description=ans['description'].strip(),
                 is_correct=float(ans['fraction'])>0.0,
-                question=question[0],
+                question=question,
             )
             if answer[1]:
                 logger.info(f'Add new answer, id={answer[0].id}')
