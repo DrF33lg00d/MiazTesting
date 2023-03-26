@@ -31,16 +31,15 @@ def main(poscat_id: int, filename: click.File):
             .where(Answer.question == question)
             .order_by(Answer.id.asc())
             )]
-        for question in questions:
-            filename.write(f'<em>{question.description}</em><br>')
-            filename.write('<ul>')
-            for answer in answers:
-                if answer.is_correct:
-                    filename.write(f'<li><b>{answer.description}</b></li>')
-                else:
-                    filename.write(f'<li>{answer.description}</li>')
-            filename.write('</ul>')
-            filename.write('<br>')
+        filename.write(f'<em>{question.description}</em><br>')
+        filename.write('<ul>')
+        for answer in answers:
+            if answer.is_correct:
+                filename.write(f'<li><b>{answer.description}</b></li>')
+            else:
+                filename.write(f'<li>{answer.description}</li>')
+        filename.write('</ul>')
+        filename.write('<br>')
     filename.write('</body>')
     filename.write('</html>')
     logger.info(f'File {filename} created')
