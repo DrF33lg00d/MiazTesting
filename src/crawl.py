@@ -1,16 +1,18 @@
 import json
 
+import click
 import requests
 from tqdm import tqdm
 
 from src.db import PosCat, Question, Answer, init_tables
-from utils.settings import URL, POSCAT_ID, POSITION_FORMAT, logger
+from utils.settings import URL, POSITION_FORMAT, logger
 
-def main():
+
+def main(poscat_id: int):
     init_tables()
     new_question_count: int = 0
 
-    response: requests.Response = requests.post(URL, {'cat_id': POSCAT_ID})
+    response: requests.Response = requests.post(URL, {'cat_id': poscat_id})
     logger.debug(f'Reponse result: {response.status_code}')
     if response.status_code != 200:
         logger.warning('Bad response status code, closing...')
@@ -61,7 +63,3 @@ def main():
     if new_question_count:
         logger.info(f'{new_question_count} questions were added')
     print('Complete')
-
-
-if '__main__' == __name__:
-    main()
