@@ -1,33 +1,39 @@
-import requests
+import click
 
-from db import db
-import settings
-
-
-count = 0
+from src.crawl import main as craw_main
+from src.create_html import main as main_html
+from utils.settings import POSCAT_ID
 
 
-if '__main__' == __name__:
-    data = requests.post(settings.url, {'cat_id': settings.id})
-    for que in data.json()['data']['questions']:
-        que_db = db.get_question_id(que['id'])
-        if que_db:
-            count += 1
-            continue
-        db.add_question(
-            que['title'],
-            que['id'],
-            que['description']
-        )
-        que_db = db.get_question_id(que['id'])
-        for ans in que['answers']:
-            ans_id = db.get_answer_id(ans['id'])
-            if ans_id:
-                continue
-            db.add_answer(
-                ans['id'],
-                que_db,
-                ans['description'],
-                float(ans['fraction']) > 0.0
-            )
-    print(f'{count} questions were skipped')
+@click.group()
+def main():
+    pass
+
+
+@main.command()
+@click.option('--poscat', '-pc', 'poscat_id',
+              type=int,
+              help='Position Category ID',
+              default=POSCAT_ID,
+              )
+def crawl(poscat_id: int):
+    craw_main(poscat_id)
+
+
+@main.command()
+@click.option('--poscat', '-pc', 'poscat_id',
+              type=int,
+              help='Position Category ID',
+              default=POSCAT_ID,
+              )
+@click.argument('filename', type=click.File('w'))
+def create_html(poscat_id: int, filename: click.File):
+    main_html(poscat_id, filename)
+
+
+main.add_command(crawl)
+main.add_command(create_html)
+
+
+if __name__ == '__main__':
+    main()
