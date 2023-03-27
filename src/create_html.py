@@ -2,10 +2,10 @@ import click
 from tqdm import tqdm
 
 from src.db import PosCat, Question, Answer, init_tables
-from utils.settings import logger, POSCAT_ID
+from utils.settings import logger
 
 
-def main(poscat_id: int, filename: click.File):
+def main(poscat_id: int, filename: click.File) -> None:
     init_tables()
     print('Create file')
 
@@ -15,21 +15,23 @@ def main(poscat_id: int, filename: click.File):
         logger.critical(f'Cat_id {poscat_id} not found!')
         exit()
 
-    questions: list[Question] = [que for que in (Question
-         .select(Question, PosCat)
-         .join(PosCat)
-         .where(Question.poscat == poscat)
-         .order_by(Question.description.asc())
-         )]
+    questions: list[Question] = [que for que in (
+        Question.
+        select(Question, PosCat).
+        join(PosCat).
+        where(Question.poscat == poscat).
+        order_by(Question.description.asc())
+        )]
     logger.debug(f'Count of questions in db: {len(questions)}')
     filename.write('<html><head><title>Answers</title></head>')
     filename.write('<body>')
     for question in tqdm(questions, desc='Questions'):
-        answers: list[Answer] = [answer for answer in (Answer
-            .select(Answer, Question)
-            .join(Question)
-            .where(Answer.question == question)
-            .order_by(Answer.id.asc())
+        answers: list[Answer] = [answer for answer in (
+            Answer.
+            select(Answer, Question).
+            join(Question).
+            where(Answer.question == question).
+            order_by(Answer.id.asc())
             )]
         filename.write(f'<em>{question.description}</em><br>')
         filename.write('<ul>')

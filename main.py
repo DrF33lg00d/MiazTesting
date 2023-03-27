@@ -27,7 +27,7 @@ def crawl(poscat_id: int):
               default=POSCAT_ID,
               )
 @click.argument('filename', type=click.File('w'))
-def create_html(poscat_id: int, filename: str):
+def create_html(poscat_id: int, filename: click.File):
     main_html(poscat_id, filename)
 
 

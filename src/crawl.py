@@ -8,7 +8,7 @@ from src.db import PosCat, Question, Answer, init_tables
 from utils.settings import URL, POSITION_FORMAT, logger
 
 
-def main(poscat_id: int):
+def main(poscat_id: int) -> None:
     init_tables()
     new_question_count: int = 0
 
@@ -59,7 +59,7 @@ def main(poscat_id: int):
             answer: tuple[Answer, bool] = Answer.get_or_create(
                 id=ans['id'],
                 description=ans['description'].strip(),
-                is_correct=float(ans['fraction'])>0.0,
+                is_correct=float(ans['fraction']) > 0.0,
                 question=question,
             )
             if answer[1]:
